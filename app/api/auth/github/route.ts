@@ -1,0 +1,4 @@
+import { NextResponse } from "next/server";
+import { env } from "@/lib/env";
+import { OAUTH_STATE_COOKIE,token } from "@/lib/session";
+export async function GET(){if(!env.GITHUB_OAUTH_CLIENT_ID||!env.APP_URL||!env.SESSION_SECRET)return NextResponse.json({error:{code:"OAUTH_NOT_CONFIGURED",message:"GitHub OAuth is not configured"}},{status:503});const state=token();const url=new URL("https://github.com/login/oauth/authorize");url.searchParams.set("client_id",env.GITHUB_OAUTH_CLIENT_ID);url.searchParams.set("redirect_uri",`${env.APP_URL}/api/auth/callback`);url.searchParams.set("scope","read:user user:email");url.searchParams.set("state",state);const response=NextResponse.redirect(url);response.cookies.set(OAUTH_STATE_COOKIE,state,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",maxAge:600});return response}
