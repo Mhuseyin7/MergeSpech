@@ -1,0 +1,2 @@
+import { AppShell } from "@/components/AppShell";
+export default function PullRequests(){return <AppShell><div className="topline"><div><h1>Pull requests</h1><p>Evidence-backed findings from your selected GitHub repositories.</p></div></div><section className="panel"><div className="empty"><strong style={{display:'block',color:'#15202b',fontSize:15,marginBottom:8}}>Nothing to review yet</strong>MergeSpech creates analysis runs only from authenticated GitHub webhook deliveries. No findings are fabricated.</div></section></AppShell>}
