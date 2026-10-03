@@ -1,0 +1,42 @@
+{
+  "name": "mergespech",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "worker": "tsx worker/index.ts"
+  },
+  "dependencies": {
+    "@octokit/app": "^16.1.0",
+    "@prisma/client": "^6.12.0",
+    "bullmq": "^5.58.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "redis": "^5.0.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.1.6",
+    "prisma": "^6.12.0",
+    "tsx": "^4.19.2",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
