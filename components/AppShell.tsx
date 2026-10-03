@@ -1,0 +1,3 @@
+import Link from "next/link"; import { Bell, FolderGit2, Gauge, GitPullRequest, Settings } from "lucide-react"; import { Logo } from "./Logo";
+const links=[[Gauge,"Dashboard","/dashboard"],[FolderGit2,"Repositories","/repositories"],[GitPullRequest,"Pull requests","/pull-requests"],[Settings,"Settings","/settings"]] as const;
+export function AppShell({children}:{children:React.ReactNode}){return <div className="app"><aside className="side"><Logo/>{links.map(([Icon,label,href])=><Link href={href} key={href}><Icon size={16}/>{label}</Link>)}<div style={{position:"absolute",bottom:25,fontSize:12,color:"#91a1b1",padding:10}}><Bell size={14} style={{verticalAlign:"middle",marginRight:7}}/>No new notifications</div></aside><main className="main">{children}</main></div>}
