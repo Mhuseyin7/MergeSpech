@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AnalysisStatus {
+  QUEUED
+  RUNNING
+  COMPLETE
+  FAILED
+  CANCELLED
+  SKIPPED
+}
+enum FindingStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+  FALSE_POSITIVE
+}
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+enum MembershipRole {
+  OWNER
+  MEMBER
+}
+
+model User {
+  id String @id @default(cuid())
+  githubId BigInt @unique
+  login String
+  email String?
+  avatarUrl String?
+  sessions Session[]
+  memberships Membership[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  tokenHash String @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId,expiresAt])
+}
+
+model GithubInstallation {
+  id BigInt @id
+  organizationLogin String
+  repositories Repository[]
+  memberships Membership[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Membership {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  installationId BigInt
+  installation GithubInstallation @relation(fields:[installationId],references:[id],onDelete:Cascade)
+  role MembershipRole @default(MEMBER)
+  @@unique([userId,installationId])
+}
+
+model Repository {
+  id BigInt @id
+  fullName String @unique
+  defaultBranch String?
+  installationId BigInt
+  installation GithubInstallation @relation(fields:[installationId],references:[id],onDelete:Cascade)
+  pullRequests PullRequest[]
+  policy Policy?
+  createdAt DateTime @default(now())
+}
+
+model PullRequest {
+  id BigInt @id
+  repositoryId BigInt
+  repository Repository @relation(fields:[repositoryId],references:[id],onDelete:Cascade)
+  number Int
+  title String
+  headSha String
+  state String
+  runs AnalysisRun[]
+  @@unique([repositoryId,number])
+  @@index([repositoryId,headSha])
+}
+
+model AnalysisRun {
+  id String @id @default(cuid())
+  pullRequestId BigInt
+  pullRequest PullRequest @relation(fields:[pullRequestId],references:[id],onDelete:Cascade)
+  sha String
+  status AnalysisStatus @default(QUEUED)
+  deliveryId String @unique
+  findings Finding[]
+  startedAt DateTime?
+  completedAt DateTime?
+  errorCode String?
+  @@index([pullRequestId,status])
+}
+
+model Finding {
+  id String @id @default(cuid())
+  runId String
+  run AnalysisRun @relation(fields:[runId],references:[id],onDelete:Cascade)
+  fingerprint String
+  ruleId String
+  severity Severity
+  status FindingStatus @default(OPEN)
+  filePath String
+  line Int?
+  evidence Json
+  suggestion String?
+  source String @default("deterministic")
+  @@unique([runId,fingerprint])
+  @@index([fingerprint])
+}
+
+model Policy {
+  id String @id @default(cuid())
+  repositoryId BigInt @unique
+  repository Repository @relation(fields:[repositoryId],references:[id],onDelete:Cascade)
+  minimumSeverity Severity @default(HIGH)
+  excludedPaths String[] @default([])
+  revision Int @default(1)
+  updatedAt DateTime @updatedAt
+}
+
+model WebhookDelivery {
+  id String @id
+  event String
+  receivedAt DateTime @default(now())
+}
