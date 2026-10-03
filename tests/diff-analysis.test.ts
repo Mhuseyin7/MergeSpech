@@ -1,0 +1,3 @@
+import { describe,it,expect } from "vitest";
+import { findingsFromDiff } from "../lib/diff-analysis";
+describe("diff analysis",()=>{it("reports only changed lines with correct source locations",()=>{const diff="diff --git a/a.ts b/a.ts\n+++ b/a.ts\n@@ -9,2 +10,3 @@\n-old\n+const apiKey = 'super-secret-key';\n+console.log(apiKey);";const findings=findingsFromDiff(diff);expect(findings).toEqual(expect.arrayContaining([expect.objectContaining({ruleId:"potential-secret",filePath:"a.ts",line:10}),expect.objectContaining({ruleId:"debug-output",line:11})]));expect(findings[0]?.evidence).not.toContain("super-secret-key")})});
